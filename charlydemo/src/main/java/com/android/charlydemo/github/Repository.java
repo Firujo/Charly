@@ -2,7 +2,7 @@ package com.android.charlydemo.github;
 
 
 
-import com.android.charly.logcatlogger.LogcatLoggerInterceptor;
+import com.android.charly.LogcatLoggerInterceptor;
 
 import java.io.IOException;
 import java.util.List;

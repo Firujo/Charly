@@ -1,14 +1,18 @@
-package com.android.charly.logcatlogger;
+package com.android.charly;
 
 import android.util.Log;
+
+import com.android.charly.data.HttpRequest;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.Buffer;
 import okio.BufferedSource;
@@ -22,15 +26,15 @@ import okio.Okio;
 
 public class LogcatLoggerInterceptor implements Interceptor {
     private static final Charset UTF8 = Charset.forName("UTF-8");
-    private final long maxByteCount = 100000L;
+    private final long maxByteCount = 200000L;
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-
-        /*
-        this is the okhttp interceptor example.
-         */
         Request request = chain.request();
+        RequestBody requestBody = request.body();
+
+        HttpRequest httpRequest = new HttpRequest();
+
 
         long t1 = System.nanoTime();
         Log.d(this.getClass().getCanonicalName(), String.format("Sending request %s on %s%n%s %s",
@@ -58,7 +62,7 @@ public class LogcatLoggerInterceptor implements Interceptor {
         long bufferSize = bufferClone.size();
         long maxBytes = Math.min(bufferSize, maxByteCount);
         String body = "";
-        try{
+        try {
             body = bufferClone.readString(maxBytes, charset);
         } catch (EOFException e) {
             body += "unexpected end of file";
@@ -85,7 +89,7 @@ public class LogcatLoggerInterceptor implements Interceptor {
         if (isGzipped) {
             GzipSource source = new GzipSource(bufferedSource);
             return Okio.buffer(source);
-        }else
+        } else
             return bufferedSource;
     }
 
