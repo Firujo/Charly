@@ -1,6 +1,12 @@
 package com.android.charly.data;
 
+import com.android.charly.utils.JsonConvertor;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import okhttp3.Headers;
 
 /**
  * Created by Jdandrade on 4/30/2017.
@@ -64,8 +70,12 @@ public class HttpRequest {
         return requestHeaders;
     }
 
-    public void setRequestHeaders(String requestHeaders) {
-        this.requestHeaders = requestHeaders;
+    public void setRequestHeaders(Headers headers) {
+        setRequestHeaders(toHttpHeaderList(headers));
+    }
+
+    public void setRequestHeaders(List<HttpHeader> headers) {
+        requestHeaders = JsonConvertor.getInstance().toJson(headers);
     }
 
     public String getRequestBody() {
@@ -98,5 +108,13 @@ public class HttpRequest {
 
     public void setResponseBody(String responseBody) {
         this.responseBody = responseBody;
+    }
+
+    private List<HttpHeader> toHttpHeaderList(Headers headers) {
+        List<HttpHeader> httpHeaders = new ArrayList<>();
+        for (int i = 0, count = headers.size(); i < count; i++) {
+            httpHeaders.add(new HttpHeader(headers.name(i), headers.value(i)));
+        }
+        return httpHeaders;
     }
 }

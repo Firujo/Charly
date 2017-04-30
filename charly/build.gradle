@@ -4,15 +4,15 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
 
-    defaultConfig{
+    defaultConfig {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "alpha"
     }
 
-    buildTypes{
-        debug{
+    buildTypes {
+        debug {
             debuggable true
         }
 
@@ -28,4 +28,5 @@ dependencies {
 
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.google.code.gson:gson:2.6.1'
 }

@@ -34,6 +34,9 @@ public class LogcatLoggerInterceptor implements Interceptor {
         RequestBody requestBody = request.body();
 
         HttpRequest httpRequest = new HttpRequest();
+        httpRequest.setMethod(request.method());
+        httpRequest.setUrl(request.url().toString());
+        httpRequest.setRequestHeaders(request.headers());
 
 
         long t1 = System.nanoTime();
