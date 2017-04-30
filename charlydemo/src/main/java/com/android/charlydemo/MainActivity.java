@@ -1,5 +1,6 @@
 package com.android.charlydemo;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,11 +19,12 @@ public class MainActivity extends AppCompatActivity {
 
         button = (Button) findViewById(R.id.button);
 
+        final Context context = this;
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Repository repo = new Repository();
-                repo.makeRequest();
+                repo.makeRequest(context);
             }
         });
     }

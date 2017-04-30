@@ -1,8 +1,10 @@
 package com.android.charly;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.charly.data.HttpRequest;
+import com.android.charly.utils.NotificationHelper;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -32,6 +34,17 @@ import okio.Okio;
 public class LogcatLoggerInterceptor implements Interceptor {
     private static final Charset UTF8 = Charset.forName("UTF-8");
     private final long maxByteCount = 200000L;
+
+    private final NotificationHelper notificationHelper;
+    private final boolean showNotification;
+    private final Context context;
+
+    public LogcatLoggerInterceptor(Context context) {
+        this.context = context.getApplicationContext();
+        notificationHelper = new NotificationHelper(this.context);
+        showNotification = true;
+    }
+
 
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -96,26 +109,15 @@ public class LogcatLoggerInterceptor implements Interceptor {
             }
         }
 
-        showNotification();
-
-        long tt1 = System.nanoTime();
-        Log.d(this.getClass().getCanonicalName(), String.format("Sending request %s on %s%n%s %s",
-                request.url(), chain.connection(), request.headers(), request.body()));
-
-
-        long tt2 = System.nanoTime();
-        Log.d(this.getClass().getCanonicalName(), String.format("Received response for %s in %.1fms%n%s",
-                response.request().url(), (requestDuration - startTime) / 1e6d, response.headers()));
-
-        /*
-        okhttp example ends here
-         */
+        Log.d(this.getClass().getCanonicalName(), httpRequest.toString());
 
         return response;
     }
 
-    private void showNotification() {
-
+    private void showNotification(HttpRequest httpRequest) {
+        if (showNotification) {
+            notificationHelper.show(httpRequest);
+        }
     }
 
     private String readFromBuffer(Buffer bufferClone, Charset charset) {

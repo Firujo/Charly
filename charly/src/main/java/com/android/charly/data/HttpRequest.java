@@ -212,4 +212,25 @@ public class HttpRequest {
         Complete,
         Failed
     }
+
+    @Override
+    public String toString() {
+        return "HttpRequest{" +
+                "id=" + id +
+                ", requestDate=" + requestDate +
+                ", responseDate=" + responseDate +
+                ", requestDuration=" + requestDuration +
+                ", url='" + url + '\'' +
+                ", host='" + host + '\'' +
+                ", path='" + path + '\'' +
+                ", method='" + method + '\'' +
+                ", requestHeaders='" + requestHeaders + '\'' +
+                ", requestBody='" + requestBody + '\'' +
+                ", responseCode=" + responseCode +
+                ", responseMessage='" + responseMessage + '\'' +
+                ", error='" + error + '\'' +
+                ", responseHeaders='" + responseHeaders + '\'' +
+                ", responseBody='" + responseBody + '\'' +
+                '}';
+    }
 }

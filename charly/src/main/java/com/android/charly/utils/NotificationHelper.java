@@ -42,9 +42,9 @@ public class NotificationHelper {
         requestCount = 0;
     }
 
-    private static synchronized void addToBuffer(HttpRequest transaction) {
+    private static synchronized void addToBuffer(HttpRequest httpRequest) {
         requestCount++;
-        requestBuffer.put(transaction.getId(), transaction);
+        requestBuffer.put(httpRequest.getId(), httpRequest);
         if (requestBuffer.size() > BUFFER_SIZE) {
             requestBuffer.removeAt(0);
         }
