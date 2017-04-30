@@ -7,13 +7,18 @@ import com.android.charly.data.HttpRequest;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Headers;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.internal.http.HttpHeaders;
 import okio.Buffer;
 import okio.BufferedSource;
 import okio.GzipSource;
@@ -37,28 +42,80 @@ public class LogcatLoggerInterceptor implements Interceptor {
         httpRequest.setMethod(request.method());
         httpRequest.setUrl(request.url().toString());
         httpRequest.setRequestHeaders(request.headers());
+        if (requestBody != null) {
 
+            BufferedSource source = getSource(new Buffer(), bodyGzipped(request.headers()));
+            Buffer buffer = source.buffer();
+            requestBody.writeTo(buffer);
+            Charset charset = UTF8;
+            MediaType contentType = requestBody.contentType();
+            if (contentType != null) {
+                charset = contentType.charset(UTF8);
+            }
+            if (isPlaintext(buffer)) {
+                httpRequest.setRequestBody(readFromBuffer(buffer, charset));
+            }
+        }
 
-        long t1 = System.nanoTime();
+        long startTime = System.nanoTime();
+        Response response;
+        try {
+            response = chain.proceed(request);
+        } catch (Exception e) {
+            httpRequest.setError(e.toString());
+            throw e;
+        }
+        long requestDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+
+        ResponseBody responseBody = response.body();
+
+        httpRequest.setRequestHeaders(response.request().headers()); // includes headers added later in the chain
+        httpRequest.setResponseDate(new Date());
+        httpRequest.setRequestDuration(requestDuration);
+        httpRequest.setResponseCode(response.code());
+        httpRequest.setResponseMessage(response.message());
+
+        httpRequest.setResponseHeaders(response.headers());
+
+        if (HttpHeaders.hasBody(response)) {
+            BufferedSource source = getSource(response);
+            source.request(Long.MAX_VALUE);
+            Buffer buffer = source.buffer();
+            Charset charset = UTF8;
+            MediaType contentType = responseBody.contentType();
+            if (contentType != null) {
+                try {
+                    charset = contentType.charset(UTF8);
+                } catch (UnsupportedCharsetException e) {
+
+                    return response;
+                }
+            }
+            if (isPlaintext(buffer)) {
+                httpRequest.setResponseBody(readFromBuffer(buffer.clone(), charset));
+            }
+        }
+
+        showNotification();
+
+        long tt1 = System.nanoTime();
         Log.d(this.getClass().getCanonicalName(), String.format("Sending request %s on %s%n%s %s",
                 request.url(), chain.connection(), request.headers(), request.body()));
 
-        Response response = chain.proceed(request);
 
-        long t2 = System.nanoTime();
+        long tt2 = System.nanoTime();
         Log.d(this.getClass().getCanonicalName(), String.format("Received response for %s in %.1fms%n%s",
-                response.request().url(), (t2 - t1) / 1e6d, response.headers()));
+                response.request().url(), (requestDuration - startTime) / 1e6d, response.headers()));
 
         /*
         okhttp example ends here
          */
 
-        BufferedSource bufferedSource = getSource(response);
-        bufferedSource.request(Long.MAX_VALUE);
-        Buffer buffer = bufferedSource.buffer();
-
-        Log.d(this.getClass().getCanonicalName(), readFromBuffer(buffer.clone(), UTF8));
         return response;
+    }
+
+    private void showNotification() {
+
     }
 
     private String readFromBuffer(Buffer bufferClone, Charset charset) {
@@ -94,6 +151,26 @@ public class LogcatLoggerInterceptor implements Interceptor {
             return Okio.buffer(source);
         } else
             return bufferedSource;
+    }
+
+    private boolean isPlaintext(Buffer buffer) {
+        try {
+            Buffer prefix = new Buffer();
+            long byteCount = buffer.size() < 64 ? buffer.size() : 64;
+            buffer.copyTo(prefix, 0, byteCount);
+            for (int i = 0; i < 16; i++) {
+                if (prefix.exhausted()) {
+                    break;
+                }
+                int codePoint = prefix.readUtf8CodePoint();
+                if (Character.isISOControl(codePoint) && !Character.isWhitespace(codePoint)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (EOFException e) {
+            return false; // Truncated UTF-8 sequence.
+        }
     }
 
     private boolean bodyGzipped(Headers headers) {
