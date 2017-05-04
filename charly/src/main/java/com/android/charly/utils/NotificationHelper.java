@@ -23,6 +23,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.LongSparseArray;
 
 import com.android.charly.Charly;
+import com.android.charly.R;
 import com.android.charly.data.HttpRequest;
 import com.android.charly.view.CharlyActivity;
 
@@ -44,7 +45,7 @@ public class NotificationHelper {
 
     private static synchronized void addToBuffer(HttpRequest httpRequest) {
         requestCount++;
-        requestBuffer.put(httpRequest.getId(), httpRequest);
+        requestBuffer.put(1, httpRequest);
         if (requestBuffer.size() > BUFFER_SIZE) {
             requestBuffer.removeAt(0);
         }
@@ -55,12 +56,13 @@ public class NotificationHelper {
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    public synchronized void show(HttpRequest transaction) {
-        addToBuffer(transaction);
+    public synchronized void show(HttpRequest httpRequest) {
+        addToBuffer(httpRequest);
         if (!CharlyActivity.isInForeground()) {
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                     .setContentIntent(PendingIntent.getActivity(context, 0, Charly.getLaunchIntent(context), 0))
                     .setLocalOnly(true)
+                    .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle("title");
             NotificationCompat.InboxStyle inboxStyle =
                     new NotificationCompat.InboxStyle();

@@ -111,6 +111,8 @@ public class LogcatLoggerInterceptor implements Interceptor {
 
         Log.d(this.getClass().getCanonicalName(), httpRequest.toString());
 
+        showNotification(httpRequest);
+
         return response;
     }
 
