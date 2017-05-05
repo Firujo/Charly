@@ -6,21 +6,20 @@ package com.android.charly.data;
 
 public class HttpHeader {
 
-    private final String name;
-    private final String value;
+  private final String name;
+  private final String value;
 
-    HttpHeader(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
+  HttpHeader(String name, String value) {
+    this.name = name;
+    this.value = value;
+  }
 
-    public String getValue() {
-        return value;
-    }
+  public String getValue() {
+    return value;
+  }
 
-    public String getName() {
-        return name;
-    }
-
+  public String getName() {
+    return name;
+  }
 }
 

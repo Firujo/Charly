@@ -17,12 +17,11 @@ package com.android.charly;
 
 import android.content.Context;
 import android.content.Intent;
-
 import com.android.charly.view.MainActivity;
 
 public class Charly {
 
-    public static Intent getLaunchIntent(Context context) {
-        return new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    }
+  public static Intent getLaunchIntent(Context context) {
+    return new Intent(context, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  }
 }

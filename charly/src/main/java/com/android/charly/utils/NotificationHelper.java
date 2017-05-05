@@ -21,7 +21,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.LongSparseArray;
-
 import com.android.charly.Charly;
 import com.android.charly.R;
 import com.android.charly.data.HttpRequest;
@@ -29,65 +28,66 @@ import com.android.charly.view.CharlyActivity;
 
 public class NotificationHelper {
 
-    private static final int NOTIFICATION_ID = 1138;
-    private static final int BUFFER_SIZE = 10;
+  private static final int NOTIFICATION_ID = 1138;
+  private static final int BUFFER_SIZE = 10;
 
-    private static final LongSparseArray<HttpRequest> requestBuffer = new LongSparseArray<>();
-    private static int requestCount;
+  private static final LongSparseArray<HttpRequest> requestBuffer = new LongSparseArray<>();
+  private static int requestCount;
 
-    private final Context context;
-    private final NotificationManager notificationManager;
+  private final Context context;
+  private final NotificationManager notificationManager;
 
-    public static synchronized void clearBuffer() {
-        requestBuffer.clear();
-        requestCount = 0;
+  public NotificationHelper(Context context) {
+    this.context = context;
+    notificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+  }
+
+  public static synchronized void clearBuffer() {
+    requestBuffer.clear();
+    requestCount = 0;
+  }
+
+  private static synchronized void addToBuffer(HttpRequest httpRequest) {
+    requestCount++;
+    requestBuffer.put(1, httpRequest);
+    if (requestBuffer.size() > BUFFER_SIZE) {
+      requestBuffer.removeAt(0);
     }
+  }
 
-    private static synchronized void addToBuffer(HttpRequest httpRequest) {
-        requestCount++;
-        requestBuffer.put(1, httpRequest);
-        if (requestBuffer.size() > BUFFER_SIZE) {
-            requestBuffer.removeAt(0);
+  public synchronized void show(HttpRequest httpRequest) {
+    addToBuffer(httpRequest);
+    if (!CharlyActivity.isInForeground()) {
+      NotificationCompat.Builder mBuilder =
+          new NotificationCompat.Builder(context).setContentIntent(
+              PendingIntent.getActivity(context, 0, Charly.getLaunchIntent(context), 0))
+              .setLocalOnly(true)
+              .setSmallIcon(R.mipmap.ic_launcher)
+              .setContentTitle("title");
+      NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+      int count = 0;
+      for (int i = requestBuffer.size() - 1; i >= 0; i--) {
+        if (count < BUFFER_SIZE) {
+          if (count == 0) {
+            mBuilder.setContentText(requestBuffer.valueAt(i).getNotificationText());
+          }
+          inboxStyle.addLine(requestBuffer.valueAt(i).getNotificationText());
         }
+        count++;
+      }
+      mBuilder.setAutoCancel(true);
+      mBuilder.setStyle(inboxStyle);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        mBuilder.setSubText(String.valueOf(requestCount));
+      } else {
+        mBuilder.setNumber(requestCount);
+      }
+      notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
+  }
 
-    public NotificationHelper(Context context) {
-        this.context = context;
-        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    }
-
-    public synchronized void show(HttpRequest httpRequest) {
-        addToBuffer(httpRequest);
-        if (!CharlyActivity.isInForeground()) {
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                    .setContentIntent(PendingIntent.getActivity(context, 0, Charly.getLaunchIntent(context), 0))
-                    .setLocalOnly(true)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle("title");
-            NotificationCompat.InboxStyle inboxStyle =
-                    new NotificationCompat.InboxStyle();
-            int count = 0;
-            for (int i = requestBuffer.size() - 1; i >= 0; i--) {
-                if (count < BUFFER_SIZE) {
-                    if (count == 0) {
-                        mBuilder.setContentText(requestBuffer.valueAt(i).getNotificationText());
-                    }
-                    inboxStyle.addLine(requestBuffer.valueAt(i).getNotificationText());
-                }
-                count++;
-            }
-            mBuilder.setAutoCancel(true);
-            mBuilder.setStyle(inboxStyle);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mBuilder.setSubText(String.valueOf(requestCount));
-            } else {
-                mBuilder.setNumber(requestCount);
-            }
-            notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-        }
-    }
-
-    public void dismiss() {
-        notificationManager.cancel(NOTIFICATION_ID);
-    }
+  public void dismiss() {
+    notificationManager.cancel(NOTIFICATION_ID);
+  }
 }
