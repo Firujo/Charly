@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:padding="12dp"
+    >
+
+  <TextView
+      android:id="@+id/http_code"
+      android:layout_width="40dp"
+      android:layout_height="wrap_content"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentStart="true"
+      android:padding="2dp"
+      tools:text="404"
+      />
+
+  <TextView
+      android:id="@+id/path"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toEndOf="@id/http_code"
+      android:layout_toRightOf="@id/http_code"
+      android:padding="2dp"
+      tools:text="GET test path"
+      />
+
+  <TextView
+      android:id="@+id/host"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/path"
+      android:layout_toEndOf="@id/http_code"
+      android:layout_toRightOf="@id/http_code"
+      android:padding="2dp"
+      tools:text="test host"
+      />
+
+  <LinearLayout
+      android:id="@+id/info"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/host"
+      android:layout_marginLeft="40dp"
+      android:layout_marginStart="40dp"
+      >
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        tools:text="18:29:07"
+        />
+
+    <TextView
+        android:id="@+id/duration"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:padding="2dp"
+        tools:text="8023 ms"
+        />
+
+    <TextView
+        android:id="@+id/size"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:padding="2dp"
+        tools:text="16.45 KB"
+        />
+
+  </LinearLayout>
+
+</RelativeLayout>

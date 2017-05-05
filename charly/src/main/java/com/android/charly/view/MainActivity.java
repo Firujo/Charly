@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 
 import com.android.charly.R;
-import com.android.charly.data.HttpRequest;
+import com.android.charly.view.requests.RequestListFragment;
 
 public class MainActivity extends CharlyActivity {
 
