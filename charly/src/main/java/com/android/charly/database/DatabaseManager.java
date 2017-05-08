@@ -1,9 +1,11 @@
 package com.android.charly.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.android.charly.data.HttpRequest;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by filipe on 03-05-2017.
@@ -29,9 +31,6 @@ public class DatabaseManager extends SQLiteOpenHelper {
   public static final String COLUMN_ERROR = "error";
   public static final String COLUMN_RESPONSE_HEADERS = "response_headers";
   public static final String COLUMN_RESPONSE_BODY = "response_body";
-  public static final String COLUMN_RESPONSE_BODY = "response_body";
-
-
 
   public DatabaseManager(Context context, String name, SQLiteDatabase.CursorFactory factory,
       int version) {
@@ -45,9 +44,9 @@ public class DatabaseManager extends SQLiteOpenHelper {
         + COLUMN_ID
         + " LONG PRIMARY KEY AUTOINCREMENT "
         + COLUMN_REQUEST_DATE
-        + " DATE "
-        +  COLUMN_RESPONSE_DATE
-        + " DATE "
+        + " TEXT "
+        + COLUMN_RESPONSE_DATE
+        + " TEXT "
         + COLUMN_REQUEST_DURATION
         + " LONG "
         + COLUMN_URL
@@ -75,11 +74,39 @@ public class DatabaseManager extends SQLiteOpenHelper {
         + ");";
 
     db.execSQL(query);
-
   }
 
   @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    db.execSQL("DROP TABLE IF EXISTS "+ TABLE_REQUESTS);
+    db.execSQL("DROP TABLE IF EXISTS " + TABLE_REQUESTS);
+  }
+
+  public boolean insert(String table, HttpRequest httpRequest) {
+    SQLiteDatabase db = this.getWritableDatabase();
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    ContentValues values = new ContentValues();
+    values.put(COLUMN_ID, httpRequest.getId());
+    values.put(COLUMN_REQUEST_DATE, sdf.format(httpRequest.getRequestDate()));
+    values.put(COLUMN_RESPONSE_DATE, sdf.format(httpRequest.getRequestDate()));
+    values.put(COLUMN_REQUEST_DURATION, httpRequest.getRequestDuration());
+    values.put(COLUMN_URL, httpRequest.getUrl());
+    values.put(COLUMN_HOST, httpRequest.getHost());
+    values.put(COLUMN_PATH, httpRequest.getPath());
+    values.put(COLUMN_METHOD, httpRequest.getMethod());
+    values.put(COLUMN_REQUEST_HEADERS, httpRequest.getRequestHeaders());
+    values.put(COLUMN_REQUEST_BODY, httpRequest.getRequestBody());
+    values.put(COLUMN_RESPONSE_CODE, httpRequest.getResponseCode());
+    values.put(COLUMN_RESPONSE_MESSAGE, httpRequest.getResponseMessage());
+    values.put(COLUMN_ERROR, httpRequest.getError());
+    values.put(COLUMN_RESPONSE_HEADERS, httpRequest.getResponseHeaders());
+    values.put(COLUMN_RESPONSE_BODY, httpRequest.getResponseBody());
+
+    long result = db.insert(table, null, values);
+    if (result == -1) {
+      return false;
+    }
+    return true;
   }
 
 
