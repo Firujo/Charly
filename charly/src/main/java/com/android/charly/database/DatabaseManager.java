@@ -2,10 +2,13 @@ package com.android.charly.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.android.charly.data.HttpRequest;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.Callable;
 
 /**
  * Created by filipe on 03-05-2017.
@@ -44,9 +47,9 @@ public class DatabaseManager extends SQLiteOpenHelper {
         + COLUMN_ID
         + " LONG PRIMARY KEY AUTOINCREMENT "
         + COLUMN_REQUEST_DATE
-        + " TEXT "
+        + " LONG "
         + COLUMN_RESPONSE_DATE
-        + " TEXT "
+        + " LONG "
         + COLUMN_REQUEST_DURATION
         + " LONG "
         + COLUMN_URL
@@ -83,12 +86,10 @@ public class DatabaseManager extends SQLiteOpenHelper {
   public boolean insert(String table, HttpRequest httpRequest) {
     SQLiteDatabase db = this.getWritableDatabase();
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
     ContentValues values = new ContentValues();
     values.put(COLUMN_ID, httpRequest.getId());
-    values.put(COLUMN_REQUEST_DATE, sdf.format(httpRequest.getRequestDate()));
-    values.put(COLUMN_RESPONSE_DATE, sdf.format(httpRequest.getRequestDate()));
+    values.put(COLUMN_REQUEST_DATE, httpRequest.getRequestDate().getTime());
+    values.put(COLUMN_RESPONSE_DATE, httpRequest.getRequestDate().getTime());
     values.put(COLUMN_REQUEST_DURATION, httpRequest.getRequestDuration());
     values.put(COLUMN_URL, httpRequest.getUrl());
     values.put(COLUMN_HOST, httpRequest.getHost());
@@ -109,5 +110,70 @@ public class DatabaseManager extends SQLiteOpenHelper {
     return true;
   }
 
+  public void deleteRequestsByRequestDate(String table, Date requestDate) {
+    SQLiteDatabase db = this.getWritableDatabase();
+    long date = requestDate.getTime();
+    db.execSQL("DELETE FROM "
+        + table
+        + " WHERE "
+        + COLUMN_REQUEST_DATE
+        + " >= "
+        + requestDate.getTime()
+        + ";");
+  }
 
+  public void deleteRequestsByHost(String table, String host) {
+    SQLiteDatabase db = this.getWritableDatabase();
+
+    db.execSQL("DELETE FROM " + table + " WHERE " + COLUMN_HOST + " =\"" + host + "\";");
+  }
+
+  public String selectAll(String table) {
+    SQLiteDatabase db = this.getWritableDatabase();
+    String query = " SELECT * FROM " + table;
+    db.execSQL(query);
+  }
+
+  public void selectByRequestDate(String table, String field, Date requestDate) {
+    SQLiteDatabase db = this.getWritableDatabase();
+    String dbResult = "";
+    long date = requestDate.getTime();
+    String query = " SELECT * FROM " + table + " WHERE " + COLUMN_REQUEST_DATE + " >= " + date;
+
+    Cursor c = db.rawQuery(query, null);
+    c.moveToFirst();
+    while (!c.isAfterLast()) {
+      if (c.getString(c.getColumnIndex(COLUMN_REQUEST_DATE)) != null) {
+        dbResult += c.getString(c.getColumnIndex(field));
+        dbResult += "\n";
+        c.moveToNext();
+      }
+    }
+    db.close();
+  }
+
+  public boolean update(String table, HttpRequest httpRequest, long id) {
+
+    SQLiteDatabase db = this.getWritableDatabase();
+
+    ContentValues values = new ContentValues();
+    values.put(COLUMN_ID, httpRequest.getId());
+    values.put(COLUMN_REQUEST_DATE, httpRequest.getRequestDate().getTime());
+    values.put(COLUMN_RESPONSE_DATE, httpRequest.getRequestDate().getTime());
+    values.put(COLUMN_REQUEST_DURATION, httpRequest.getRequestDuration());
+    values.put(COLUMN_URL, httpRequest.getUrl());
+    values.put(COLUMN_HOST, httpRequest.getHost());
+    values.put(COLUMN_PATH, httpRequest.getPath());
+    values.put(COLUMN_METHOD, httpRequest.getMethod());
+    values.put(COLUMN_REQUEST_HEADERS, httpRequest.getRequestHeaders());
+    values.put(COLUMN_REQUEST_BODY, httpRequest.getRequestBody());
+    values.put(COLUMN_RESPONSE_CODE, httpRequest.getResponseCode());
+    values.put(COLUMN_RESPONSE_MESSAGE, httpRequest.getResponseMessage());
+    values.put(COLUMN_ERROR, httpRequest.getError());
+    values.put(COLUMN_RESPONSE_HEADERS, httpRequest.getResponseHeaders());
+    values.put(COLUMN_RESPONSE_BODY, httpRequest.getResponseBody());
+
+    db.update(table, values, "ID = ?", new String[] { Long.toString(id) });
+    return true;
+  }
 }
