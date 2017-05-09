@@ -128,28 +128,31 @@ public class DatabaseManager extends SQLiteOpenHelper {
     db.execSQL("DELETE FROM " + table + " WHERE " + COLUMN_HOST + " =\"" + host + "\";");
   }
 
-  public String selectAll(String table) {
+  public Cursor selectAll(String table) {
     SQLiteDatabase db = this.getWritableDatabase();
     String query = " SELECT * FROM " + table;
-    db.execSQL(query);
+    Cursor c = db.rawQuery(query, null);
+    db.close();
+    return c;
   }
 
-  public void selectByRequestDate(String table, String field, Date requestDate) {
+  public Cursor selectByRequestDate(String table, String field, Date requestDate) {
     SQLiteDatabase db = this.getWritableDatabase();
     String dbResult = "";
     long date = requestDate.getTime();
     String query = " SELECT * FROM " + table + " WHERE " + COLUMN_REQUEST_DATE + " >= " + date;
 
     Cursor c = db.rawQuery(query, null);
-    c.moveToFirst();
-    while (!c.isAfterLast()) {
-      if (c.getString(c.getColumnIndex(COLUMN_REQUEST_DATE)) != null) {
-        dbResult += c.getString(c.getColumnIndex(field));
-        dbResult += "\n";
-        c.moveToNext();
-      }
-    }
+    //c.moveToFirst();
+    //while (!c.isAfterLast()) {
+    //  if (c.getString(c.getColumnIndex(COLUMN_REQUEST_DATE)) != null) {
+    //    dbResult += c.getString(c.getColumnIndex(field));
+    //    dbResult += "\n";
+    //    c.moveToNext();
+    //  }
+    //}
     db.close();
+    return c;
   }
 
   public boolean update(String table, HttpRequest httpRequest, long id) {
