@@ -64,7 +64,7 @@ public class NotificationHelper {
               PendingIntent.getActivity(context, 0, Charly.getLaunchIntent(context), 0))
               .setLocalOnly(true)
               .setSmallIcon(R.mipmap.ic_launcher)
-              .setContentTitle("title");
+              .setContentTitle(httpRequest.getHost());
       NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
       int count = 0;
       for (int i = requestBuffer.size() - 1; i >= 0; i--) {
