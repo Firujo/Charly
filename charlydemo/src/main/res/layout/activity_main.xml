@@ -1,35 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     tools:context="com.android.charlydemo.MainActivity"
     >
 
   <Button
       android:id="@+id/button"
-      android:layout_width="0dp"
-      android:layout_height="0dp"
-      android:text="Request"
+      android:layout_width="100dp"
+      android:layout_height="wrap_content"
+      android:text="Github Request"
       app:layout_constraintBottom_toTopOf="@+id/logger"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
       />
-
-  <EditText
-      android:id="@+id/logger"
-      android:layout_width="0dp"
-      android:layout_height="0dp"
-      android:background="@color/colorPrimary"
-      android:gravity="start"
-      android:textColor="@color/colorAccent"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/button"
-      tools:text="@string/app_name"
-      />
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

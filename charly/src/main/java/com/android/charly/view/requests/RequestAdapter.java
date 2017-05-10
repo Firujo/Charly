@@ -29,13 +29,11 @@ class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.ViewHolder> {
   }
 
   @Override public void onBindViewHolder(ViewHolder viewHolder, int position) {
-    String[] arr = { "200", "404", "200", "500" };
     String[] arr1 = { "40ms", "35ms", "34ms", "56ms" };
     String[] arr2 = { "13kb", "14kb", "13kb", "12kb" };
-    Random random = new Random();
     Random random1 = new Random();
     Random random2 = new Random();
-    viewHolder.code.setText(arr[random.nextInt(arr.length)]);
+    viewHolder.code.setText("200");
     viewHolder.host.setText("api.github.com");
     viewHolder.path.setText("/users/octocat/repos");
     viewHolder.time.setText("20:31:0" + position);
