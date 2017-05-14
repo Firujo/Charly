@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
  * Created by filipe on 03-05-2017.
  */
 
-public class DatabaseManager extends SQLiteOpenHelper {
+public class Database extends SQLiteOpenHelper {
 
   private static int DATABASE_VERSION = 1;
   private static final String DATABASE_NAME = "charly.db";
@@ -35,7 +35,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
   public static final String COLUMN_RESPONSE_HEADERS = "response_headers";
   public static final String COLUMN_RESPONSE_BODY = "response_body";
 
-  public DatabaseManager(Context context, String name, SQLiteDatabase.CursorFactory factory,
+  public Database(Context context, String name, SQLiteDatabase.CursorFactory factory,
       int version) {
     super(context, DATABASE_NAME, factory, DATABASE_VERSION);
   }
