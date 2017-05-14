@@ -35,8 +35,7 @@ public class Database extends SQLiteOpenHelper {
   public static final String COLUMN_RESPONSE_HEADERS = "response_headers";
   public static final String COLUMN_RESPONSE_BODY = "response_body";
 
-  public Database(Context context, String name, SQLiteDatabase.CursorFactory factory,
-      int version) {
+  public Database(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
     super(context, DATABASE_NAME, factory, DATABASE_VERSION);
   }
 
@@ -178,5 +177,11 @@ public class Database extends SQLiteOpenHelper {
 
     db.update(table, values, "ID = ?", new String[] { Long.toString(id) });
     return true;
+  }
+
+  public void deleteAllRequests() {
+    SQLiteDatabase db = this.getWritableDatabase();
+    db.delete(Database.TABLE_REQUESTS,"",null);
+    db.close();
   }
 }
