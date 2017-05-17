@@ -118,6 +118,14 @@ public class HttpRequest {
     setResponseHeaders(toHttpHeaderList(headers));
   }
 
+  /**
+   * To use to create the httrequest goten from the db
+   * @param responseHeaders
+   */
+  public void setResponseHeaders(String responseHeaders) {
+    this.responseHeaders = responseHeaders;
+  }
+
   public Status getStatus() {
     if (error != null) {
       return Status.Failed;
